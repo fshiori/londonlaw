@@ -22,25 +22,25 @@
 # This class is an attempt at a more robust cross-platform version of a
 # wxStaticBitmap.
 
-from wxPython.wx import *
+from wx import *
 
-class StaticBitmap(wxWindow):
-   def __init__(self, parent, id, bitmap, position = wxDefaultPosition, size = wxDefaultSize):
-      wxWindow.__init__(self, parent, id, position, size)
+class StaticBitmap(Window):
+   def __init__(self, parent, id, bitmap, position = DefaultPosition, size = DefaultSize):
+      Window.__init__(self, parent, id, position, size)
       self.bitmap = bitmap
-      self.SetSize(wxSize(self.bitmap.GetWidth(), self.bitmap.GetHeight()))
+      self.SetSize(Size(self.bitmap.GetWidth(), self.bitmap.GetHeight()))
 
       EVT_PAINT(self, self.OnPaint)
 
 
    def OnPaint(self, event):
-      self.srcDC  = wxMemoryDC()
+      self.srcDC  = MemoryDC()
       self.srcDC.SelectObject(self.bitmap)
-      destDC = wxPaintDC(self)
+      destDC = PaintDC(self)
       destDC.BeginDrawing()
       destDC.Blit(0, 0, self.bitmap.GetWidth(), self.bitmap.GetHeight(), self.srcDC, 0, 0)
       destDC.EndDrawing()
-      self.srcDC.SelectObject(wxNullBitmap)
+      self.srcDC.SelectObject(NullBitmap)
 
 
    def GetBitmap(self):
@@ -53,7 +53,7 @@ class StaticBitmap(wxWindow):
 
    def DoGetBestSize(self):
       print "called DoGetBestSize()"
-      return wxSize(self.bitmap.GetWidth(), self.bitmap.GetHeight())
+      return Size(self.bitmap.GetWidth(), self.bitmap.GetHeight())
    
 #   def GetBestSize(self):
 #      print "called GetBestSize()"

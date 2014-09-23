@@ -22,21 +22,21 @@
 # This class handles a wxStaticText that is managed by a scrolled window.
 
 
-from wxPython.wx import *
+from wx import *
 
-class ScrolledLabel(wxScrolledWindow):
+class ScrolledLabel(ScrolledWindow):
    def __init__(self, parent, label):
-      wxScrolledWindow.__init__(self, parent, -1, wxDefaultPosition, wxDefaultSize, 
-         wxVSCROLL | wxSIMPLE_BORDER)
-      self.SetBackgroundColour(wxColour(200, 200, 200))
+      ScrolledWindow.__init__(self, parent, -1, DefaultPosition, DefaultSize, 
+         VSCROLL | SIMPLE_BORDER)
+      self.SetBackgroundColour(Colour(200, 200, 200))
       self.SetScrollRate(0, 5)
 
       # create the text that will be scrolled
-      self.text = wxStaticText(self, -1, label, wxPoint(0,0))
+      self.text = StaticText(self, -1, label, Point(0,0))
 
       # use a Sizer to handle geometry
-      self.topSizer = wxBoxSizer(wxVERTICAL)
-      self.topSizer.Add(self.text, 1, wxEXPAND)
+      self.topSizer = BoxSizer(VERTICAL)
+      self.topSizer.Add(self.text, 1, EXPAND)
       self.SetSizer(self.topSizer)
       self.topSizer.SetVirtualSizeHints(self)
 

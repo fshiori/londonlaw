@@ -24,7 +24,7 @@
 
 
 from twisted.python import log
-from wxPython.wx import *
+from wx import *
 from londonlaw.common.protocol import *
 from londonlaw.common.config import *
 from AutoListCtrl import *
@@ -34,35 +34,35 @@ import os.path
 
 
 # Create a small dialog for choosing a team.
-class TeamDialog(wxDialog):
+class TeamDialog(Dialog):
    def __init__(self, parent):
-      wxDialog.__init__(self, parent, -1, "Choose a Team", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxSUNKEN_BORDER)
-      panel = wxPanel(self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL)
+      Dialog.__init__(self, parent, -1, "Choose a Team", DefaultPosition, DefaultSize, DEFAULT_DIALOG_STYLE|SUNKEN_BORDER)
+      panel = Panel(self, -1, DefaultPosition, DefaultSize, TAB_TRAVERSAL)
 
-      self.choice = wxRadioBox(panel, -1, "team: ", wxDefaultPosition, wxDefaultSize,
-         ["Detectives", "Mr. X"], 1, wxRA_SPECIFY_COLS)
-      self.submitButton = wxButton(panel, wxID_OK, "OK")
-      self.cancelButton = wxButton(panel, wxID_CANCEL, "Cancel")
+      self.choice = RadioBox(panel, -1, "team: ", DefaultPosition, DefaultSize,
+         ["Detectives", "Mr. X"], 1, RA_SPECIFY_COLS)
+      self.submitButton = Button(panel, ID_OK, "OK")
+      self.cancelButton = Button(panel, ID_CANCEL, "Cancel")
 
-      buttonSizer = wxBoxSizer(wxHORIZONTAL)
-      buttonSizer.Add(self.cancelButton, 0, wxALIGN_CENTRE|wxALL, 5)
-      buttonSizer.Add(self.submitButton, 0, wxALIGN_CENTRE|wxALL, 5)
+      buttonSizer = BoxSizer(HORIZONTAL)
+      buttonSizer.Add(self.cancelButton, 0, ALIGN_CENTRE|ALL, 5)
+      buttonSizer.Add(self.submitButton, 0, ALIGN_CENTRE|ALL, 5)
 
-      vSizer = wxBoxSizer(wxVERTICAL)
-      vSizer.Add(self.choice, 0, wxALIGN_CENTRE|wxALL, 5)
-      vSizer.Add((1, 1), 1, wxEXPAND)
-      vSizer.Add(buttonSizer, 0, wxALIGN_RIGHT|wxALL, 5)
+      vSizer = BoxSizer(VERTICAL)
+      vSizer.Add(self.choice, 0, ALIGN_CENTRE|ALL, 5)
+      vSizer.Add((1, 1), 1, EXPAND)
+      vSizer.Add(buttonSizer, 0, ALIGN_RIGHT|ALL, 5)
 
       panel.SetSizer(vSizer)
       vSizer.Fit(panel)
-      sizer = wxBoxSizer(wxVERTICAL)
-      sizer.Add(panel, 1, wxEXPAND | wxALL, 5)
+      sizer = BoxSizer(VERTICAL)
+      sizer.Add(panel, 1, EXPAND | ALL, 5)
       self.SetSizer(sizer)
       sizer.Fit(self)
       self.SetAutoLayout(1)
 
-      EVT_BUTTON(self, wxID_OK, self.submit)
-      EVT_BUTTON(self, wxID_CANCEL, self.cancel) 
+      EVT_BUTTON(self, ID_OK, self.submit)
+      EVT_BUTTON(self, ID_CANCEL, self.cancel) 
 
 
    def submit(self, event):
@@ -76,9 +76,9 @@ class TeamDialog(wxDialog):
 
 
 # Generate the main registration window.
-class RegistrationWindow(wxFrame):
+class RegistrationWindow(Frame):
    def __init__(self, parent, ID, title, messenger):
-      wxFrame.__init__(self, parent, ID, title)
+      Frame.__init__(self, parent, ID, title)
 
       self._messenger = messenger
 
@@ -86,17 +86,17 @@ class RegistrationWindow(wxFrame):
       EXIT       = 101
 
       # Create a menu bar
-      fileMenu = wxMenu("File")
+      fileMenu = Menu("File")
       fileMenu.Append(DISCONNECT, "Disconnect", "Disconnect from server")
       fileMenu.Append(EXIT, "Exit\tCTRL+Q", "Exit London Law")
-      menuBar = wxMenuBar()
+      menuBar = MenuBar()
       menuBar.Append(fileMenu, "File")
       self.SetMenuBar(menuBar)
 
       self.status = self.CreateStatusBar()
 
       # stick everything in a panel
-      mainPanel = wxPanel(self, -1)
+      mainPanel = Panel(self, -1)
 
       self.list = AutoListCtrl(mainPanel, -1,
             ("Player", "Team", "Votes to Start?", "Pawns"),
@@ -104,21 +104,21 @@ class RegistrationWindow(wxFrame):
 
       self.list.SetColumnWidth(1, 140) 
 
-      mainSizer = wxBoxSizer(wxVERTICAL)
-      mainSizer.Add(self.list, 3, wxALIGN_CENTRE|wxEXPAND|wxALL, 5)
+      mainSizer = BoxSizer(VERTICAL)
+      mainSizer.Add(self.list, 3, ALIGN_CENTRE|EXPAND|ALL, 5)
 
       self.chatWindow = ChatPanel(mainPanel, "", False)
-      mainSizer.Add(self.chatWindow, 2, wxEXPAND|wxALL, 5)
+      mainSizer.Add(self.chatWindow, 2, EXPAND|ALL, 5)
 
-      self.leaveButton = wxButton(mainPanel, -1, "Leave Game")
-      self.teamButton  = wxButton(mainPanel, -1, "Choose Team")
-      self.voteButton  = wxButton(mainPanel, -1, "Vote to Start")
-      buttonSizer      = wxBoxSizer(wxHORIZONTAL)
-      buttonSizer.Add(self.leaveButton, 0, wxALIGN_CENTRE | wxLEFT | wxRIGHT | wxBOTTOM | wxALL, 5)
-      buttonSizer.Add((1, 1), 1, wxEXPAND)
-      buttonSizer.Add(self.teamButton, 0, wxALIGN_CENTRE | wxRIGHT | wxBOTTOM | wxALL, 5)
-      buttonSizer.Add(self.voteButton, 0, wxALIGN_CENTRE | wxRIGHT | wxBOTTOM | wxALL, 5)
-      mainSizer.Add(buttonSizer, 0, wxEXPAND, 0)
+      self.leaveButton = Button(mainPanel, -1, "Leave Game")
+      self.teamButton  = Button(mainPanel, -1, "Choose Team")
+      self.voteButton  = Button(mainPanel, -1, "Vote to Start")
+      buttonSizer      = BoxSizer(HORIZONTAL)
+      buttonSizer.Add(self.leaveButton, 0, ALIGN_CENTRE | LEFT | RIGHT | BOTTOM | ALL, 5)
+      buttonSizer.Add((1, 1), 1, EXPAND)
+      buttonSizer.Add(self.teamButton, 0, ALIGN_CENTRE | RIGHT | BOTTOM | ALL, 5)
+      buttonSizer.Add(self.voteButton, 0, ALIGN_CENTRE | RIGHT | BOTTOM | ALL, 5)
+      mainSizer.Add(buttonSizer, 0, EXPAND, 0)
 
       mainPanel.SetSizer(mainSizer)
       mainSizer.Fit(mainPanel)
@@ -154,7 +154,7 @@ class RegistrationWindow(wxFrame):
 
 
    def enableSelectButton(self, event):
-      self.selectButton.Enable(TRUE)
+      self.selectButton.Enable(True)
 
 
    def disableSelectButton(self, event):
@@ -180,8 +180,8 @@ class RegistrationWindow(wxFrame):
 
    def showInfoAlert(self, info):
       self.PushStatusText("")
-      alert = wxMessageDialog(self, info,
-         "Server Message", wxOK|wxICON_INFORMATION)
+      alert = MessageDialog(self, info,
+         "Server Message", OK|ICON_INFORMATION)
       alert.ShowModal()
 
 
@@ -190,17 +190,17 @@ class RegistrationWindow(wxFrame):
 
 
    def menuExit(self, event):
-      alert = wxMessageDialog(self, "Disconnect from the server and exit London Law?",
-         "Disconnect and Quit", wxYES_NO|wxICON_EXCLAMATION)
-      if alert.ShowModal() == wxID_YES:
+      alert = MessageDialog(self, "Disconnect from the server and exit London Law?",
+         "Disconnect and Quit", YES_NO|ICON_EXCLAMATION)
+      if alert.ShowModal() == ID_YES:
          self._messenger.netDisconnect()
          self.Close()
 
 
    def menuDisconnect(self, event):
-      alert = wxMessageDialog(self, "Disconnect from the server?",
-         "Disconnect", wxYES_NO|wxICON_EXCLAMATION)
-      if alert.ShowModal() == wxID_YES:
+      alert = MessageDialog(self, "Disconnect from the server?",
+         "Disconnect", YES_NO|ICON_EXCLAMATION)
+      if alert.ShowModal() == ID_YES:
          self._messenger.netDisconnect()
          self._messenger.guiLaunchConnectionWindow()
 

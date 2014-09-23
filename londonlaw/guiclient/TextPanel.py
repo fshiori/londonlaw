@@ -23,21 +23,21 @@
 # allows one to set both foreground and background colors, as well as
 # borders around the window.
 
-from wxPython.wx import *
+from wx import *
 
 # Generate a text label drawn on a wxPanel.
-class TextPanel(wxPanel):
+class TextPanel(Panel):
    def __init__(self, parent, text, points = 10, style = 0):
-      wxPanel.__init__(self, parent, -1, wxDefaultPosition, wxDefaultSize, style)
+      Panel.__init__(self, parent, -1, DefaultPosition, DefaultSize, style)
 
-      font = wxFont(points, wxDEFAULT, wxNORMAL, wxNORMAL)
-      self.text = wxStaticText(self, -1, text, wxPoint(0,0))
+      font = Font(points, DEFAULT, NORMAL, NORMAL)
+      self.text = StaticText(self, -1, text, Point(0,0))
       self.text.SetFont(font)
 
-      self.sizer = wxBoxSizer(wxVERTICAL)
-      self.sizer.Add((0, 0), 1, wxEXPAND)
-      self.sizer.Add(self.text, 0, wxALIGN_CENTRE|wxADJUST_MINSIZE)
-      self.sizer.Add((0, 0), 1, wxEXPAND)
+      self.sizer = BoxSizer(VERTICAL)
+      self.sizer.Add((0, 0), 1, EXPAND)
+      self.sizer.Add(self.text, 0, ALIGN_CENTRE|ADJUST_MINSIZE)
+      self.sizer.Add((0, 0), 1, EXPAND)
       self.SetSizer(self.sizer)
       self.sizer.SetSizeHints(self)
 
@@ -48,13 +48,13 @@ class TextPanel(wxPanel):
 
    def SetForegroundColour(self, color):
       self.text.SetForegroundColour(color)
-      wxPanel.SetForegroundColour(self, color)
+      Panel.SetForegroundColour(self, color)
 
    # def SetBackgroundColour(self, color)
    # (this function falls through to call SetBackgroundColour on the wxPanel)
    def SetBackgroundColour(self, color):
       self.text.SetBackgroundColour(color)
-      wxPanel.SetBackgroundColour(self, color)
+      Panel.SetBackgroundColour(self, color)
    
 
 

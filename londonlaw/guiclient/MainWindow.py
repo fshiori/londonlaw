@@ -21,7 +21,7 @@
 # This class handles the main in-game window.  It has a map window,
 # a set of player status icons, a chat area, and some useful buttons.
 
-from wxPython.wx import *
+from wx import *
 from MapWindow import *
 from ChatPanel import *
 from PlayerIcon import *
@@ -33,11 +33,11 @@ import time
 
 
 
-class MainWindow(wxFrame):
+class MainWindow(Frame):
    # players is a list of Mr. X and all detectives, their
    # positions, and their tokens
    def __init__(self, parent, ID, title, username, playerList, messenger):
-      wxFrame.__init__(self, parent, ID, title)
+      Frame.__init__(self, parent, ID, title)
       
       self.username         = username
       self.playerList       = playerList
@@ -62,18 +62,18 @@ class MainWindow(wxFrame):
       self.ABOUT      = 105
 
       # Create a menu bar
-      menuBar = wxMenuBar()
-      self.fileMenu = wxMenu()
+      menuBar = MenuBar()
+      self.fileMenu = Menu()
       self.fileMenu.Append(self.DISCONNECT, "Disconnect", "Disconnect from server")
       self.fileMenu.Append(self.EXIT, "Exit\tCTRL+Q", "Exit London Law")
       menuBar.Append(self.fileMenu, "File")
-      self.viewMenu = wxMenu()
+      self.viewMenu = Menu()
       self.viewMenu.AppendCheckItem(self.FULLSCREEN, "Fullscreen Map\tCTRL+F11", "Toggle fullscreen map view")
       self.viewMenu.AppendCheckItem(self.ZOOM, "Map Zoom\tCTRL+Z", "Toggle map zoom level")
       self.viewMenu.AppendCheckItem(self.HISTORY, "Mr. X History\tCTRL+Y", "Show/hide the Mr. X history window")
-      self.viewMenu.Check(self.HISTORY, true)
+      self.viewMenu.Check(self.HISTORY, True)
       menuBar.Append(self.viewMenu, "View")
-      self.helpMenu = wxMenu()
+      self.helpMenu = Menu()
       self.helpMenu.Append(self.ABOUT, "About London Law", "About London Law")
       menuBar.Append(self.helpMenu, "Help")
       self.SetMenuBar(menuBar)
@@ -91,7 +91,7 @@ class MainWindow(wxFrame):
 
       # contain everything in a panel to get rid of the lame dark grey
       # background in Win32
-      self.panel = wxPanel(self, -1)
+      self.panel = Panel(self, -1)
 
       # create the map window
       self.mapWindow = MapWindow(self.panel, usernameList)
@@ -113,39 +113,39 @@ class MainWindow(wxFrame):
       self.icons = PlayerIconGroup(self.panel, usernameList, tokenList)
 
       # create the pushbuttons
-      self.moveButton = wxButton(self.panel, -1, "Move")
-      self.moveButton.Enable(false)
-      self.historyButton = wxCheckBox(self.panel, -1, "View History")
-      self.historyButton.SetValue(true)
-      self.zoomButton = wxCheckBox(self.panel, -1, "Zoom")
-      self.buttonSizer = wxBoxSizer(wxVERTICAL)
-      self.buttonSizer.Add(self.zoomButton, 0, wxALL, 5)
-      self.buttonSizer.Add(self.historyButton, 0, wxALL, 5)
-      self.buttonSizer.Add(self.moveButton, 0, wxALL, 5)
+      self.moveButton = Button(self.panel, -1, "Move")
+      self.moveButton.Enable(False)
+      self.historyButton = CheckBox(self.panel, -1, "View History")
+      self.historyButton.SetValue(True)
+      self.zoomButton = CheckBox(self.panel, -1, "Zoom")
+      self.buttonSizer = BoxSizer(VERTICAL)
+      self.buttonSizer.Add(self.zoomButton, 0, ALL, 5)
+      self.buttonSizer.Add(self.historyButton, 0, ALL, 5)
+      self.buttonSizer.Add(self.moveButton, 0, ALL, 5)
 
       # create a history window
       self.historyWin = HistoryWindow(self.panel)
 
-      self.centerSizer = wxBoxSizer(wxHORIZONTAL)
-      self.centerSizer.Add(self.icons, 0, wxALIGN_CENTRE|wxALL)
-      self.centerSizer.Add(self.buttonSizer, 0, wxALIGN_CENTRE)
+      self.centerSizer = BoxSizer(HORIZONTAL)
+      self.centerSizer.Add(self.icons, 0, ALIGN_CENTRE|ALL)
+      self.centerSizer.Add(self.buttonSizer, 0, ALIGN_CENTRE)
       
       # the main window is composed of three areas stacked vertically:
       # map window, player status icons, and chat windows.
       # Use a Sizer to handle this geometry.
-      self.mainSizer = wxBoxSizer(wxVERTICAL)
-      self.mainSizer.Add(self.mapWindow, 1, wxEXPAND|wxBOTTOM, 5)
-      self.mainSizer.Add(self.centerSizer, 0, wxALIGN_CENTRE)
-      self.mainSizer.Add(self.chatWindow, 0, wxEXPAND | wxALL, 5)
+      self.mainSizer = BoxSizer(VERTICAL)
+      self.mainSizer.Add(self.mapWindow, 1, EXPAND|BOTTOM, 5)
+      self.mainSizer.Add(self.centerSizer, 0, ALIGN_CENTRE)
+      self.mainSizer.Add(self.chatWindow, 0, EXPAND | ALL, 5)
 
-      self.panelSizer = wxBoxSizer(wxHORIZONTAL)
-      self.panelSizer.Add(self.historyWin, 0, wxEXPAND)
-      self.panelSizer.Add(self.mainSizer, 1, wxEXPAND)
+      self.panelSizer = BoxSizer(HORIZONTAL)
+      self.panelSizer.Add(self.historyWin, 0, EXPAND)
+      self.panelSizer.Add(self.mainSizer, 1, EXPAND)
       
       self.panel.SetSizer(self.panelSizer)
 
-      self.topSizer = wxBoxSizer(wxVERTICAL)
-      self.topSizer.Add(self.panel, 1, wxEXPAND)
+      self.topSizer = BoxSizer(VERTICAL)
+      self.topSizer.Add(self.panel, 1, EXPAND)
       self.SetSizer(self.topSizer)
       self.topSizer.Fit(self)
       self.SetAutoLayout(1)
@@ -154,7 +154,7 @@ class MainWindow(wxFrame):
 
       # need a data structure to hold a move from a MoveDialog
       self.move = []
-      self.moveDialogId  = wxNewId()
+      self.moveDialogId  = NewId()
 
       # initialize pixelToLoc algorithm
       generateGridHash()
@@ -187,17 +187,17 @@ class MainWindow(wxFrame):
 
 
    def menuExit(self, event):
-      alert = wxMessageDialog(self, "Disconnect from the server and exit London Law?",
-         "Disconnect and Quit", wxYES_NO|wxICON_EXCLAMATION)
-      if alert.ShowModal() == wxID_YES:
+      alert = MessageDialog(self, "Disconnect from the server and exit London Law?",
+         "Disconnect and Quit", YES_NO|ICON_EXCLAMATION)
+      if alert.ShowModal() == ID_YES:
          self.messenger.netDisconnect()
          self.Close()
 
 
    def menuDisconnect(self, event):
-      alert = wxMessageDialog(self, "Disconnect from the server?",
-         "Disconnect", wxYES_NO|wxICON_EXCLAMATION)
-      if alert.ShowModal() == wxID_YES:
+      alert = MessageDialog(self, "Disconnect from the server?",
+         "Disconnect", YES_NO|ICON_EXCLAMATION)
+      if alert.ShowModal() == ID_YES:
          self.messenger.netDisconnect()
          self.messenger.guiLaunchConnectionWindow()
 
@@ -268,8 +268,8 @@ class MainWindow(wxFrame):
 
       # pop up an alert box when X uses a double move
       if mover == self.lastMover and not self.isMrX:
-         alert = wxMessageDialog(self, "Mr. X just used a double move ticket!",
-            "Double Move", wxOK|wxICON_INFORMATION)
+         alert = MessageDialog(self, "Mr. X just used a double move ticket!",
+            "Double Move", OK|ICON_INFORMATION)
          alert.ShowModal()
 
       self.lastMover = mover
@@ -320,17 +320,17 @@ class MainWindow(wxFrame):
 
 
    def showInfoAlert(self, info):
-      alert = wxMessageDialog(self, info,
-         "Server Message", wxOK|wxICON_INFORMATION)
+      alert = MessageDialog(self, info,
+         "Server Message", OK|ICON_INFORMATION)
       alert.ShowModal()
 
 
    def toggleZoom(self, event):
       if self.zoomButton.GetValue():
-         self.viewMenu.Check(self.ZOOM, true)
+         self.viewMenu.Check(self.ZOOM, True)
          self.mapWindow.zoomIn()
       else:
-         self.viewMenu.Check(self.ZOOM, false)
+         self.viewMenu.Check(self.ZOOM, False)
          self.mapWindow.zoomOut()
 
 
@@ -341,13 +341,13 @@ class MainWindow(wxFrame):
 
    def toggleHistory(self, event):
       if self.historyButton.GetValue():
-         self.viewMenu.Check(self.HISTORY, true)
-         self.panelSizer.Prepend(self.historyWin, 0, wxEXPAND)
-         self.historyWin.Show(true)
+         self.viewMenu.Check(self.HISTORY, True)
+         self.panelSizer.Prepend(self.historyWin, 0, EXPAND)
+         self.historyWin.Show(True)
          self.panelSizer.Layout()
       else:
-         self.viewMenu.Check(self.HISTORY, false)
-         self.historyWin.Show(false)
+         self.viewMenu.Check(self.HISTORY, False)
+         self.historyWin.Show(False)
          self.panelSizer.Remove(self.historyWin)
          self.panelSizer.Layout()
 
@@ -365,8 +365,8 @@ class MainWindow(wxFrame):
    def toggleFullscreen(self, event):
       if not self.fullscreen:
          self.fullscreen = 1
-         self.viewMenu.Enable(self.HISTORY, false)
-         self.viewMenu.Check(self.FULLSCREEN, true)
+         self.viewMenu.Enable(self.HISTORY, False)
+         self.viewMenu.Check(self.FULLSCREEN, True)
          if self.historyButton.GetValue():
             self.historyWin.Hide()
             self.panelSizer.Remove(self.historyWin)
@@ -386,34 +386,34 @@ class MainWindow(wxFrame):
          self.panelSizer.Layout()
       else:
          self.fullscreen = 0
-         self.viewMenu.Enable(self.HISTORY, true)
-         self.viewMenu.Check(self.FULLSCREEN, false)
+         self.viewMenu.Enable(self.HISTORY, True)
+         self.viewMenu.Check(self.FULLSCREEN, False)
          if self.historyButton.GetValue():
             self.historyWin.Show()
-            self.panelSizer.Prepend(self.historyWin, 0, wxEXPAND)
-         self.buttonSizer = wxBoxSizer(wxVERTICAL)
-         self.buttonSizer.Add(self.zoomButton, 0, wxALL, 5)
-         self.buttonSizer.Add(self.historyButton, 0, wxALL, 5)
-         self.buttonSizer.Add(self.moveButton, 0, wxALL, 5)
-         self.centerSizer = wxBoxSizer(wxHORIZONTAL)
-         self.centerSizer.Add(self.icons, 0, wxALIGN_CENTRE|wxALL)
-         self.centerSizer.Add(self.buttonSizer, 0, wxALIGN_CENTRE)
-         self.mainSizer.Add(self.centerSizer, 0, wxALIGN_CENTRE)
+            self.panelSizer.Prepend(self.historyWin, 0, EXPAND)
+         self.buttonSizer = BoxSizer(VERTICAL)
+         self.buttonSizer.Add(self.zoomButton, 0, ALL, 5)
+         self.buttonSizer.Add(self.historyButton, 0, ALL, 5)
+         self.buttonSizer.Add(self.moveButton, 0, ALL, 5)
+         self.centerSizer = BoxSizer(HORIZONTAL)
+         self.centerSizer.Add(self.icons, 0, ALIGN_CENTRE|ALL)
+         self.centerSizer.Add(self.buttonSizer, 0, ALIGN_CENTRE)
+         self.mainSizer.Add(self.centerSizer, 0, ALIGN_CENTRE)
          self.icons.Show()
          self.zoomButton.Show()
          self.historyButton.Show()
          self.moveButton.Show()
          self.chatWindow.Show()
-         self.mainSizer.Add(self.chatWindow, 0, wxEXPAND | wxALL, 5)
+         self.mainSizer.Add(self.chatWindow, 0, EXPAND | ALL, 5)
          self.mainSizer.Layout()
          self.panelSizer.Layout()
 
 
    # display the About dialog
    def showAbout(self, event):
-      about = wxMessageDialog(self, "London Law v" + LLAW_VERSION + 
+      about = MessageDialog(self, "London Law v" + LLAW_VERSION + 
               "\n\nA multiplayer manhunting adventure by Paul Pelzl",
-              "About London Law", wxOK|wxICON_INFORMATION)
+              "About London Law", OK|ICON_INFORMATION)
       about.ShowModal()
 
    def scrollToPlayer0(self, event):
@@ -442,7 +442,7 @@ class MainWindow(wxFrame):
    def setPawnTurn(self, pawnName):
       if pawnName == "X":
          if self.playerList[0][0] == self.username:
-            self.moveButton.Enable(true)
+            self.moveButton.Enable(True)
             usernameStr = "you"
          else:
             usernameStr = self.playerList[0][0]
@@ -451,7 +451,7 @@ class MainWindow(wxFrame):
          self.icons.setTurn(0)
       elif pawnName == "Red":
          if self.playerList[1][0] == self.username:
-            self.moveButton.Enable(true)
+            self.moveButton.Enable(True)
             usernameStr = "you"
          else:
             usernameStr = self.playerList[1][0]
@@ -460,7 +460,7 @@ class MainWindow(wxFrame):
          self.icons.setTurn(1)
       elif pawnName == "Yellow":
          if self.playerList[2][0] == self.username:
-            self.moveButton.Enable(true)
+            self.moveButton.Enable(True)
             usernameStr = "you"
          else:
             usernameStr = self.playerList[2][0]
@@ -469,7 +469,7 @@ class MainWindow(wxFrame):
          self.icons.setTurn(2)
       elif pawnName == "Green":
          if self.playerList[3][0] == self.username:
-            self.moveButton.Enable(true)
+            self.moveButton.Enable(True)
             usernameStr = "you"
          else:
             usernameStr = self.playerList[3][0]
@@ -478,7 +478,7 @@ class MainWindow(wxFrame):
          self.icons.setTurn(3)
       elif pawnName == "Blue":
          if self.playerList[4][0] == self.username:
-            self.moveButton.Enable(true)
+            self.moveButton.Enable(True)
             usernameStr = "you"
          else:
             usernameStr = self.playerList[4][0]
@@ -487,7 +487,7 @@ class MainWindow(wxFrame):
          self.icons.setTurn(4)
       elif pawnName == "Black":
          if self.playerList[5][0] == self.username:
-            self.moveButton.Enable(true)
+            self.moveButton.Enable(True)
             usernameStr = "you"
          else:
             usernameStr = self.playerList[5][0]
@@ -511,7 +511,7 @@ class MainWindow(wxFrame):
 #         if event[0] == "game socket":
 #            self.socket = event[1]
 #         elif event[0] == "created move":
-#            self.moveButton.Enable(false)
+#            self.moveButton.Enable(False)
 #         elif event[0] == "move dialog destroyed":
 #            self.moveDialogExists = 0
 #         elif event[0] == "incoming chat":
@@ -547,14 +547,14 @@ class MainWindow(wxFrame):
 #               self.status.PushStatusText("It is the Blue Detective's turn (you).", 0)
 #            elif self.playerIdx == 5:
 #               self.status.PushStatusText("It is the Black Detective's turn (you).", 0)
-#            self.moveButton.Enable(true)
+#            self.moveButton.Enable(True)
 #         elif event[0] == "move accepted":
-#            self.moveButton.Enable(false)
+#            self.moveButton.Enable(False)
 #         elif event[0] == "move rejected":
-#            self.moveButton.Enable(true) # just in case
+#            self.moveButton.Enable(True) # just in case
 #            self.status.PushStatusText("The server rejected your move.  It is still your turn.", 0)
 #         elif event[0] == "double rejected":
-#            self.moveButton.Enable(true) # just in case
+#            self.moveButton.Enable(True) # just in case
 #            self.status.PushStatusText("The server rejected your double move.  It is still your turn.", 0) 
 #         elif event[0] == "someone moved":
 #            mover = event[1]

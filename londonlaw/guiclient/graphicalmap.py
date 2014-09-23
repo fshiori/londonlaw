@@ -16,7 +16,7 @@
 
 
 
-from wxPython.wx import *
+from wx import *
 from utility import *
 from SetHash import *
 from londonlaw.common.config import *
@@ -241,9 +241,9 @@ def locToPixel(loc, zoom):
 GRIDSIZE = (100, 100)
 MASKSIZE = (39, 42)  # size of a rect that contains a map number graphic
 gridHash = SetHash()
-wxInitAllImageHandlers()
+InitAllImageHandlers()
 maskImageFile = os.path.join(MEDIAROOT, "images/map-number-mask.png")
-maskImage = wxImage(maskImageFile, wxBITMAP_TYPE_ANY)
+maskImage = Image(maskImageFile, BITMAP_TYPE_ANY)
 
 
 # Create a hash table that assists in mapping pixel locations to map numbers.

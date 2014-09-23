@@ -20,6 +20,7 @@ import sets
 
 from twisted.python import components
 from twisted.python import log
+from zope.interface import Interface
 
 from londonlaw.common.protocol import *
 from londonlaw.common.map import *
@@ -32,7 +33,7 @@ class GameError(Exception):
    pass
 
 
-class IGameListener(components.Interface):
+class IGameListener(Interface):
    def announceHistory(self, history):
       pass
 

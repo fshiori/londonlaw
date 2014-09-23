@@ -23,7 +23,7 @@
 
 from twisted.internet import protocol, reactor
 from twisted.python import log
-from wxPython.wx import *
+from wx import *
 from ConnectWindow import *
 from GameListWindow import *
 from RegistrationWindow import *
@@ -46,7 +46,7 @@ class LLawClientFactory(protocol.ClientFactory):
 
 
 # Run the whole shebang.
-class MyApp(wxApp):
+class MyApp(App):
 
    def OnInit(self):
       TIMERID = 999999
@@ -57,14 +57,14 @@ class MyApp(wxApp):
       messenger.registerRegistrationWindowLauncher(self.register)
       messenger.registerMainWindowLauncher(self.startGame)
 
-      wxInitAllImageHandlers()  # Required to be able to load compressed images
+      InitAllImageHandlers()  # Required to be able to load compressed images
       messenger.guiLaunchConnectionWindow()
 
       EVT_TIMER(self, TIMERID, self.OnTimer)
-      self.timer = wxTimer(self, TIMERID)
+      self.timer = Timer(self, TIMERID)
       self.timer.Start(250, False)
 
-      return true
+      return True
 
 
    def OnTimer(self, event):

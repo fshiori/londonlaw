@@ -25,7 +25,7 @@
 
 
 from twisted.python import log
-from wxPython.wx import *
+from wx import *
 from londonlaw.common.protocol import *
 from londonlaw.common.config import *
 from AutoListCtrl import *
@@ -35,54 +35,54 @@ import os.path
 
 
 # Create a small dialog for creating a game
-class NewGameDialog(wxDialog):
+class NewGameDialog(Dialog):
    def __init__(self, parent, returnValue):
-      wxDialog.__init__(self, parent, -1, "Create a New Game", 
-            wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxSUNKEN_BORDER)
-      panel = wxPanel(self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL)
+      Dialog.__init__(self, parent, -1, "Create a New Game", 
+            DefaultPosition, DefaultSize, DEFAULT_DIALOG_STYLE|SUNKEN_BORDER)
+      panel = Panel(self, -1, DefaultPosition, DefaultSize, TAB_TRAVERSAL)
 
       self.returnValue = returnValue
 
-      labelFont = wxFont(self.GetFont().GetPointSize(), wxDEFAULT, wxNORMAL, wxBOLD)
-      labelFont.SetWeight(wxBOLD)
-      newGameLabel = wxStaticText(panel, -1, "New Game: ")
+      labelFont = Font(self.GetFont().GetPointSize(), DEFAULT, NORMAL, BOLD)
+      labelFont.SetWeight(BOLD)
+      newGameLabel = StaticText(panel, -1, "New Game: ")
       newGameLabel.SetFont(labelFont)
-      nameLabel         = wxStaticText(panel, -1, "game room name:", wxPoint(0,0))
-      self.nameEntry    = wxTextCtrl(panel, -1, "", wxDefaultPosition, (170, wxDefaultSize[1]))
-      typeLabel         = wxStaticText(panel, -1, "game type:", wxPoint(0,0))
-      self.typeList     = wxChoice(panel, -1, wxDefaultPosition, wxDefaultSize, ["standard"])
-      self.submitButton = wxButton(panel, wxID_OK, "OK")
-      self.cancelButton = wxButton(panel, wxID_CANCEL, "Cancel")
+      nameLabel         = StaticText(panel, -1, "game room name:", Point(0,0))
+      self.nameEntry    = TextCtrl(panel, -1, "", DefaultPosition, (170, DefaultSize[1]))
+      typeLabel         = StaticText(panel, -1, "game type:", Point(0,0))
+      self.typeList     = Choice(panel, -1, DefaultPosition, DefaultSize, ["standard"])
+      self.submitButton = Button(panel, ID_OK, "OK")
+      self.cancelButton = Button(panel, ID_CANCEL, "Cancel")
       self.typeList.SetSelection(0)
 
-      hSizer = wxBoxSizer(wxHORIZONTAL)
+      hSizer = BoxSizer(HORIZONTAL)
       hSizer.Add((30, 1), 0, 0)
-      hSizer.Add(nameLabel, 0, wxALIGN_CENTRE|wxALL, 5)
-      hSizer.Add(self.nameEntry, 0, wxALIGN_CENTRE|wxALL, 5)
+      hSizer.Add(nameLabel, 0, ALIGN_CENTRE|ALL, 5)
+      hSizer.Add(self.nameEntry, 0, ALIGN_CENTRE|ALL, 5)
       hSizer.Add((10, 1), 0, 0)
-      hSizer.Add(typeLabel, 0, wxALIGN_CENTRE|wxALL, 5)
-      hSizer.Add(self.typeList, 0, wxALIGN_CENTRE|wxALL, 5)
+      hSizer.Add(typeLabel, 0, ALIGN_CENTRE|ALL, 5)
+      hSizer.Add(self.typeList, 0, ALIGN_CENTRE|ALL, 5)
 
-      bSizer = wxBoxSizer(wxHORIZONTAL)
+      bSizer = BoxSizer(HORIZONTAL)
       bSizer.Add((1, 1), 1, 0)
-      bSizer.Add(self.cancelButton, 0, wxALIGN_CENTRE|wxALL, 5)
-      bSizer.Add(self.submitButton, 0, wxALIGN_CENTRE|wxALL, 5)
+      bSizer.Add(self.cancelButton, 0, ALIGN_CENTRE|ALL, 5)
+      bSizer.Add(self.submitButton, 0, ALIGN_CENTRE|ALL, 5)
 
-      vSizer = wxBoxSizer(wxVERTICAL)
-      vSizer.Add(newGameLabel, 0, wxALIGN_LEFT|wxALL, 5)
-      vSizer.Add(hSizer, 0, wxALIGN_LEFT|wxALL, 5)
-      vSizer.Add(bSizer, 0, wxEXPAND|wxALL, 5)
+      vSizer = BoxSizer(VERTICAL)
+      vSizer.Add(newGameLabel, 0, ALIGN_LEFT|ALL, 5)
+      vSizer.Add(hSizer, 0, ALIGN_LEFT|ALL, 5)
+      vSizer.Add(bSizer, 0, EXPAND|ALL, 5)
 
       panel.SetSizer(vSizer)
       vSizer.Fit(panel)
-      sizer = wxBoxSizer(wxVERTICAL)
-      sizer.Add(panel, 1, wxEXPAND | wxALL, 5)
+      sizer = BoxSizer(VERTICAL)
+      sizer.Add(panel, 1, EXPAND | ALL, 5)
       self.SetSizer(sizer)
       sizer.Fit(self)
       self.SetAutoLayout(1)
 
-      EVT_BUTTON(self, wxID_OK, self.submit)
-      EVT_BUTTON(self, wxID_CANCEL, self.cancel) 
+      EVT_BUTTON(self, ID_OK, self.submit)
+      EVT_BUTTON(self, ID_CANCEL, self.cancel) 
 
 
    def submit(self, event):
@@ -97,9 +97,9 @@ class NewGameDialog(wxDialog):
 
 
 # Generate the main registration window.
-class GameListWindow(wxFrame):
+class GameListWindow(Frame):
    def __init__(self, parent, ID, title, messenger):
-      wxFrame.__init__(self, parent, ID, title)
+      Frame.__init__(self, parent, ID, title)
 
       self._messenger = messenger
 
@@ -107,17 +107,17 @@ class GameListWindow(wxFrame):
       EXIT       = 101
 
       # Create a menu bar
-      fileMenu = wxMenu("File")
+      fileMenu = Menu("File")
       fileMenu.Append(DISCONNECT, "Disconnect", "Disconnect from server")
       fileMenu.Append(EXIT, "Exit\tCTRL+Q", "Exit London Law")
-      menuBar = wxMenuBar()
+      menuBar = MenuBar()
       menuBar.Append(fileMenu, "File")
       self.SetMenuBar(menuBar)
 
       self.status = self.CreateStatusBar()
 
       # stick everything in a panel
-      mainPanel = wxPanel(self, -1)
+      mainPanel = Panel(self, -1)
 
       self.list = AutoListCtrl(mainPanel, -1,
             ("Game Room", "Status", "Game Type", "Players"),
@@ -126,17 +126,17 @@ class GameListWindow(wxFrame):
       self.list.SetColumnWidth(1, 140) 
       self.list.SetColumnWidth(2, 140) 
 
-      mainSizer = wxBoxSizer(wxVERTICAL)
-      mainSizer.Add(self.list, 1, wxALIGN_CENTRE|wxEXPAND|wxALL, 5)
+      mainSizer = BoxSizer(VERTICAL)
+      mainSizer.Add(self.list, 1, ALIGN_CENTRE|EXPAND|ALL, 5)
 
-      self.selectButton = wxButton(mainPanel, -1, "Join Game")
+      self.selectButton = Button(mainPanel, -1, "Join Game")
       self.selectButton.Disable()
-      self.createButton = wxButton(mainPanel, -1, "New Game")
-      buttonSizer = wxBoxSizer(wxHORIZONTAL)
-      buttonSizer.Add((1, 1), 1, wxEXPAND)
-      buttonSizer.Add(self.createButton, 0, wxALIGN_CENTRE | wxRIGHT | wxBOTTOM | wxALL, 5)
-      buttonSizer.Add(self.selectButton, 0, wxALIGN_CENTRE | wxRIGHT | wxBOTTOM | wxALL, 5)
-      mainSizer.Add(buttonSizer, 0, wxEXPAND, 0)
+      self.createButton = Button(mainPanel, -1, "New Game")
+      buttonSizer = BoxSizer(HORIZONTAL)
+      buttonSizer.Add((1, 1), 1, EXPAND)
+      buttonSizer.Add(self.createButton, 0, ALIGN_CENTRE | RIGHT | BOTTOM | ALL, 5)
+      buttonSizer.Add(self.selectButton, 0, ALIGN_CENTRE | RIGHT | BOTTOM | ALL, 5)
+      mainSizer.Add(buttonSizer, 0, EXPAND, 0)
 
       mainPanel.SetSizer(mainSizer)
       mainSizer.Fit(mainPanel)
@@ -160,7 +160,7 @@ class GameListWindow(wxFrame):
 
 
    def enableSelectButton(self, event):
-      self.selectButton.Enable(TRUE)
+      self.selectButton.Enable(True)
 
 
    def disableSelectButton(self, event):
@@ -176,29 +176,29 @@ class GameListWindow(wxFrame):
    
 
    def joinGame(self, event):
-      selected = self.list.GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)
+      selected = self.list.GetNextItem(-1, LIST_NEXT_ALL, LIST_STATE_SELECTED)
       self._messenger.netJoinGame(self.list.GetItemText(selected))  
 
 
    def showInfoAlert(self, info):
       self.PushStatusText("")
-      alert = wxMessageDialog(self, info,
-         "Server Message", wxOK|wxICON_INFORMATION)
+      alert = MessageDialog(self, info,
+         "Server Message", OK|ICON_INFORMATION)
       alert.ShowModal()
 
 
    def menuExit(self, event):
-      alert = wxMessageDialog(self, "Disconnect from the server and exit London Law?",
-         "Disconnect and Quit", wxYES_NO|wxICON_EXCLAMATION)
-      if alert.ShowModal() == wxID_YES:
+      alert = MessageDialog(self, "Disconnect from the server and exit London Law?",
+         "Disconnect and Quit", YES_NO|ICON_EXCLAMATION)
+      if alert.ShowModal() == ID_YES:
          self._messenger.netDisconnect()
          self.Close()
 
 
    def menuDisconnect(self, event):
-      alert = wxMessageDialog(self, "Disconnect from the server?",
-         "Disconnect", wxYES_NO|wxICON_EXCLAMATION)
-      if alert.ShowModal() == wxID_YES:
+      alert = MessageDialog(self, "Disconnect from the server?",
+         "Disconnect", YES_NO|ICON_EXCLAMATION)
+      if alert.ShowModal() == ID_YES:
          self._messenger.netDisconnect()
          self._messenger.guiLaunchConnectionWindow()
 

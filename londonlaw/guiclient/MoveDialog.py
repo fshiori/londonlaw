@@ -28,21 +28,21 @@
 # FIXME: this appears to be correct, but needs some major cleanup.  Maybe some portions
 #        can be factored better into functions.
 
-from wxPython.wx import *
+from wx import *
 from londonlaw.common.map import *
 
 
 
-DIALOGDESTROYED = wxNewEventType() 
+DIALOGDESTROYED = NewEventType() 
  
 def EVT_DIALOGDESTROYED(window, function): 
     """Your documentation here""" 
     window.Connect(-1, -1, DIALOGDESTROYED, function)
  
-class DialogDestroyedEvent(wxPyCommandEvent): 
+class DialogDestroyedEvent(PyCommandEvent): 
     eventType = DIALOGDESTROYED
     def __init__(self, windowID): 
-        wxPyCommandEvent.__init__(self, self.eventType, windowID) 
+        PyCommandEvent.__init__(self, self.eventType, windowID) 
  
     def Clone(self): 
         self.__class__(self.GetId()) 
@@ -50,7 +50,7 @@ class DialogDestroyedEvent(wxPyCommandEvent):
 
 
 
-class MoveDialog(wxDialog):
+class MoveDialog(Dialog):
    # currPos is an integer indicating the current player position
    # destPos is a first choice destination, which the player probably
    #    chose by clicking on a map location
@@ -59,10 +59,10 @@ class MoveDialog(wxDialog):
    # Use EVT_GOT_MOVE to catch the return values (insert derogatory comment about
    #    lack of flexibility in return values for wxDialog::EndModal())
    def __init__(self, parent, ID, destPos, playerList, playerIdx, messenger):
-      wxDialog.__init__(self, parent, ID, "Choose a Move")
+      Dialog.__init__(self, parent, ID, "Choose a Move")
       self.parent = parent
 
-      self.panel = wxPanel(self, -1)
+      self.panel = Panel(self, -1)
 
       self.playerIdx  = playerIdx
       self.playerList = playerList
@@ -71,41 +71,41 @@ class MoveDialog(wxDialog):
 
       # Mr. X gets the option of a double move
       if self.playerIdx == 0:
-         self.moveType = wxRadioBox(self.panel, -1, "move type: ", wxDefaultPosition, wxDefaultSize,
-            ["Single", "Double"], 1, wxRA_SPECIFY_ROWS)
+         self.moveType = RadioBox(self.panel, -1, "move type: ", DefaultPosition, DefaultSize,
+            ["Single", "Double"], 1, RA_SPECIFY_ROWS)
          # If he has no double move tokens, then it's disabled
          if self.playerList[self.playerIdx][2][4] < 1:
-            self.moveType.Enable(false)
+            self.moveType.Enable(False)
       
-      self.pos1Label = wxStaticText(self.panel, -1, "Move from "+`self.currPos`+" to ", wxPoint(0,0))
-      self.trans1Label = wxStaticText(self.panel, -1, " using ", wxPoint(0,0))
+      self.pos1Label = StaticText(self.panel, -1, "Move from "+`self.currPos`+" to ", Point(0,0))
+      self.trans1Label = StaticText(self.panel, -1, " using ", Point(0,0))
 
       self.moves, self.movesStr = self.getAvailMoves(self.currPos, self.playerList, self.playerIdx)
-      self.dest1Box = wxChoice(self.panel, -1, wxDefaultPosition, wxDefaultSize, self.movesStr)
+      self.dest1Box = Choice(self.panel, -1, DefaultPosition, DefaultSize, self.movesStr)
       self.dest1Box.SetSelection(0)
       if destPos in self.moves:
-         self.Show(TRUE)
+         self.Show(True)
          for i in range(len(self.moves)):
             if self.moves[i] == destPos:
                self.dest1Box.SetSelection(i)
                break
       else:
-         self.Show(FALSE)
+         self.Show(False)
          if destPos != 0:
             self.drawMoveErrorDialog()
       
 
-      self.trans1ID = wxNewId()
+      self.trans1ID = NewId()
       self.trans, self.transStr = self.getAvailTransports(self.currPos, self.moves[self.dest1Box.GetSelection()],
          self.playerList[self.playerIdx][2], self.playerIdx)
-      self.trans1Box = wxChoice(self.panel, self.trans1ID, wxDefaultPosition, wxDefaultSize, self.transStr)
+      self.trans1Box = Choice(self.panel, self.trans1ID, DefaultPosition, DefaultSize, self.transStr)
       self.trans1Box.SetSelection(0)
 
 
       # double move options
       if self.playerIdx == 0:
-         self.pos2Label = wxStaticText(self.panel, -1, "Move from "+self.dest1Box.GetStringSelection()+" to ", wxPoint(0,0))
-         self.trans2Label = wxStaticText(self.panel, -1, " using ", wxPoint(0,0))
+         self.pos2Label = StaticText(self.panel, -1, "Move from "+self.dest1Box.GetStringSelection()+" to ", Point(0,0))
+         self.trans2Label = StaticText(self.panel, -1, " using ", Point(0,0))
 
          # create a new playerList that has an updated location and list of tokens for Mr. X, assuming
          # that the first leg of the double move is complete.  This new list is required to figure out
@@ -123,75 +123,75 @@ class MoveDialog(wxDialog):
          for i in range(1, len(self.playerList)):
             pl2.append(self.playerList[i])
 
-         self.dest2ID = wxNewId()
+         self.dest2ID = NewId()
          self.moves2, self.moves2Str = self.getAvailMoves(self.moves[self.dest1Box.GetSelection()], pl2, 0)
-         self.dest2Box = wxChoice(self.panel, self.dest2ID, wxDefaultPosition, wxDefaultSize, self.moves2Str)
+         self.dest2Box = Choice(self.panel, self.dest2ID, DefaultPosition, DefaultSize, self.moves2Str)
          self.dest2Box.SetSelection(0)
 
-         self.trans2ID = wxNewId()
+         self.trans2ID = NewId()
          self.trans2, self.trans2Str = self.getAvailTransports(self.moves[self.dest1Box.GetSelection()],
             self.moves2[self.dest2Box.GetSelection()], pl2[0][2], 0)
-         self.trans2Box = wxChoice(self.panel, self.trans2ID, wxDefaultPosition, wxDefaultSize, self.trans2Str)
+         self.trans2Box = Choice(self.panel, self.trans2ID, DefaultPosition, DefaultSize, self.trans2Str)
          self.trans2Box.SetSelection(0)
 
-         self.move2Sizer = wxBoxSizer(wxHORIZONTAL)
-         self.move2Sizer.Add(self.pos2Label, 0, wxALIGN_CENTRE | wxALL | wxADJUST_MINSIZE, 5)
-         self.move2Sizer.Add(self.dest2Box, 0, wxALIGN_CENTRE | wxALL, 5)
-         self.move2Sizer.Add(self.trans2Label, 0, wxALIGN_CENTRE | wxALL | wxADJUST_MINSIZE, 5)
-         self.move2Sizer.Add(self.trans2Box, 0, wxALIGN_CENTRE | wxALL, 5)
+         self.move2Sizer = BoxSizer(HORIZONTAL)
+         self.move2Sizer.Add(self.pos2Label, 0, ALIGN_CENTRE | ALL | ADJUST_MINSIZE, 5)
+         self.move2Sizer.Add(self.dest2Box, 0, ALIGN_CENTRE | ALL, 5)
+         self.move2Sizer.Add(self.trans2Label, 0, ALIGN_CENTRE | ALL | ADJUST_MINSIZE, 5)
+         self.move2Sizer.Add(self.trans2Box, 0, ALIGN_CENTRE | ALL, 5)
 
-         labelFont = wxFont(self.GetFont().GetPointSize(), wxDEFAULT, wxNORMAL, wxBOLD)
-         labelFont.SetWeight(wxBOLD)
-         self.move1Label = wxStaticText(self.panel, -1, "Move One:")
-         self.move2Label = wxStaticText(self.panel, -1, "Move Two:") 
+         labelFont = Font(self.GetFont().GetPointSize(), DEFAULT, NORMAL, BOLD)
+         labelFont.SetWeight(BOLD)
+         self.move1Label = StaticText(self.panel, -1, "Move One:")
+         self.move2Label = StaticText(self.panel, -1, "Move Two:") 
          self.move1Label.SetFont(labelFont)
          self.move2Label.SetFont(labelFont)
 
          if self.playerIdx == 0:
-            self.move2Label.Enable(false)
-         self.pos2Label.Enable(false)
-         self.trans2Label.Enable(false)
-         self.dest2Box.Enable(false)
-         self.trans2Box.Enable(false)
+            self.move2Label.Enable(False)
+         self.pos2Label.Enable(False)
+         self.trans2Label.Enable(False)
+         self.dest2Box.Enable(False)
+         self.trans2Box.Enable(False)
 
 
-      okButton = wxButton(self.panel, wxID_OK, "OK")
-      cancelButton = wxButton(self.panel, wxID_CANCEL, "Cancel")
+      okButton = Button(self.panel, ID_OK, "OK")
+      cancelButton = Button(self.panel, ID_CANCEL, "Cancel")
 
-      self.move1Sizer = wxBoxSizer(wxHORIZONTAL)
-      self.move1Sizer.Add(self.pos1Label, 0, wxALIGN_CENTRE | wxALL | wxADJUST_MINSIZE, 5)
-      self.move1Sizer.Add(self.dest1Box, 0, wxALIGN_CENTRE | wxALL, 5)
-      self.move1Sizer.Add(self.trans1Label, 0, wxALIGN_CENTRE | wxALL | wxADJUST_MINSIZE, 5)
-      self.move1Sizer.Add(self.trans1Box, 0, wxALIGN_CENTRE | wxALL, 5)
+      self.move1Sizer = BoxSizer(HORIZONTAL)
+      self.move1Sizer.Add(self.pos1Label, 0, ALIGN_CENTRE | ALL | ADJUST_MINSIZE, 5)
+      self.move1Sizer.Add(self.dest1Box, 0, ALIGN_CENTRE | ALL, 5)
+      self.move1Sizer.Add(self.trans1Label, 0, ALIGN_CENTRE | ALL | ADJUST_MINSIZE, 5)
+      self.move1Sizer.Add(self.trans1Box, 0, ALIGN_CENTRE | ALL, 5)
 
-      buttonSizer = wxBoxSizer(wxHORIZONTAL)
-      buttonSizer.Add(cancelButton, 0, wxALIGN_CENTRE | wxALL, 5)
-      buttonSizer.Add(okButton, 0, wxALIGN_CENTRE | wxALL, 5)
+      buttonSizer = BoxSizer(HORIZONTAL)
+      buttonSizer.Add(cancelButton, 0, ALIGN_CENTRE | ALL, 5)
+      buttonSizer.Add(okButton, 0, ALIGN_CENTRE | ALL, 5)
 
-      self.pSizer = wxBoxSizer(wxVERTICAL)
+      self.pSizer = BoxSizer(VERTICAL)
       if self.playerIdx == 0:
-         self.pSizer.Add(self.moveType, 0, wxALIGN_CENTRE | wxALL, 5)
-         self.pSizer.Add(self.move1Label, 0, wxALIGN_LEFT | wxLEFT | wxTOP, 5)
+         self.pSizer.Add(self.moveType, 0, ALIGN_CENTRE | ALL, 5)
+         self.pSizer.Add(self.move1Label, 0, ALIGN_LEFT | LEFT | TOP, 5)
          self.move1Sizer.Prepend((10,1),0,0)
-      self.pSizer.Add(self.move1Sizer, 0, wxALIGN_CENTRE | wxALL | wxADJUST_MINSIZE, 5)
+      self.pSizer.Add(self.move1Sizer, 0, ALIGN_CENTRE | ALL | ADJUST_MINSIZE, 5)
       if self.playerIdx == 0:
-         self.pSizer.Add(self.move2Label, 0, wxALIGN_LEFT | wxLEFT | wxTOP, 5)
+         self.pSizer.Add(self.move2Label, 0, ALIGN_LEFT | LEFT | TOP, 5)
          self.move2Sizer.Prepend((10,1),0,0)
-         self.pSizer.Add(self.move2Sizer, 0, wxALIGN_CENTRE | wxALL | wxADJUST_MINSIZE, 5)
-      self.pSizer.Add(buttonSizer, 0, wxALIGN_RIGHT | wxALL, 5)
+         self.pSizer.Add(self.move2Sizer, 0, ALIGN_CENTRE | ALL | ADJUST_MINSIZE, 5)
+      self.pSizer.Add(buttonSizer, 0, ALIGN_RIGHT | ALL, 5)
 
       self.panel.SetSizer(self.pSizer)
       self.pSizer.Fit(self.panel)
-      self.sizer = wxBoxSizer(wxVERTICAL)
-      self.sizer.Add(self.panel, 1, wxEXPAND | wxALL | wxADJUST_MINSIZE, 5)
+      self.sizer = BoxSizer(VERTICAL)
+      self.sizer.Add(self.panel, 1, EXPAND | ALL | ADJUST_MINSIZE, 5)
       self.SetSizer(self.sizer)
       self.sizer.Fit(self)
       self.SetAutoLayout(1)
 
       self.dest1Box.SetFocus()
 
-      EVT_BUTTON(self, wxID_CANCEL, self.OnCancel)
-      EVT_BUTTON(self, wxID_OK, self.OnOK)
+      EVT_BUTTON(self, ID_CANCEL, self.OnCancel)
+      EVT_BUTTON(self, ID_OK, self.OnOK)
       EVT_CHOICE(self, self.dest1Box.GetId(), self.updateTrans1)
       if self.playerIdx == 0:
          EVT_CHOICE(self, self.dest2Box.GetId(), self.updateTrans2Evt)
@@ -211,13 +211,13 @@ class MoveDialog(wxDialog):
          prefix = "The Blue Detective"
       elif self.playerIdx == 5:
          prefix = "The Black Detective"
-      alert = wxMessageDialog(self.parent, prefix + " can't move to that location.", "Illegal Move", wxOK|wxICON_ERROR)
+      alert = MessageDialog(self.parent, prefix + " can't move to that location.", "Illegal Move", OK|ICON_ERROR)
       alert.ShowModal()
 
 
    def setDest1(self, destPos):
       if destPos in self.moves:
-         self.Show(TRUE)
+         self.Show(True)
          for i in range(len(self.moves)):
             if self.moves[i] == destPos:
                self.dest1Box.SetSelection(i)
@@ -229,17 +229,17 @@ class MoveDialog(wxDialog):
 
    def updateDouble(self, event):
       if self.moveType.GetSelection() == 0:
-         self.move2Label.Enable(false)
-         self.pos2Label.Enable(false)
-         self.trans2Label.Enable(false)
-         self.dest2Box.Enable(false)
-         self.trans2Box.Enable(false)
+         self.move2Label.Enable(False)
+         self.pos2Label.Enable(False)
+         self.trans2Label.Enable(False)
+         self.dest2Box.Enable(False)
+         self.trans2Box.Enable(False)
       else:
-         self.move2Label.Enable(true) 
-         self.pos2Label.Enable(true)
-         self.trans2Label.Enable(true)
-         self.dest2Box.Enable(true)
-         self.trans2Box.Enable(true)
+         self.move2Label.Enable(True) 
+         self.pos2Label.Enable(True)
+         self.trans2Label.Enable(True)
+         self.dest2Box.Enable(True)
+         self.trans2Box.Enable(True)
 
 
 
@@ -250,9 +250,9 @@ class MoveDialog(wxDialog):
          self.playerList[self.playerIdx][2], self.playerIdx)
       self.move1Sizer.Remove(self.trans1Box)
       self.trans1Box.Destroy()
-      self.trans1Box = wxChoice(self.panel, self.trans1ID, wxDefaultPosition, wxDefaultSize, self.transStr)
+      self.trans1Box = Choice(self.panel, self.trans1ID, DefaultPosition, DefaultSize, self.transStr)
       self.trans1Box.SetSelection(0)
-      self.move1Sizer.Add(self.trans1Box, 0, wxALIGN_CENTRE | wxALL, 5)
+      self.move1Sizer.Add(self.trans1Box, 0, ALIGN_CENTRE | ALL, 5)
       self.move1Sizer.Layout()
       self.updateDest2()
 
@@ -283,12 +283,12 @@ class MoveDialog(wxDialog):
          self.move2Sizer.Remove(self.pos2Label)
          self.move2Sizer.Remove(self.dest2Box)
          self.dest2Box.Destroy()
-         self.dest2Box = wxChoice(self.panel, self.dest2ID, wxDefaultPosition, wxDefaultSize, self.moves2Str)
+         self.dest2Box = Choice(self.panel, self.dest2ID, DefaultPosition, DefaultSize, self.moves2Str)
          self.dest2Box.SetSelection(0)
          if self.moveType.GetSelection() == 0:
-            self.dest2Box.Enable(false)
-         self.move2Sizer.Prepend(self.dest2Box, 0, wxALIGN_CENTRE | wxALL, 5)
-         self.move2Sizer.Prepend(self.pos2Label, 0, wxALIGN_CENTRE | wxALL | wxADJUST_MINSIZE, 5)
+            self.dest2Box.Enable(False)
+         self.move2Sizer.Prepend(self.dest2Box, 0, ALIGN_CENTRE | ALL, 5)
+         self.move2Sizer.Prepend(self.pos2Label, 0, ALIGN_CENTRE | ALL | ADJUST_MINSIZE, 5)
          self.updateTrans2()
       else:
          self.sizer.Layout()
@@ -307,11 +307,11 @@ class MoveDialog(wxDialog):
          self.moves2[self.dest2Box.GetSelection()], xtokens, 0)
       self.move2Sizer.Remove(self.trans2Box)
       self.trans2Box.Destroy()
-      self.trans2Box = wxChoice(self.panel, self.trans2ID, wxDefaultPosition, wxDefaultSize, self.trans2Str)
+      self.trans2Box = Choice(self.panel, self.trans2ID, DefaultPosition, DefaultSize, self.trans2Str)
       self.trans2Box.SetSelection(0)
       if self.moveType.GetSelection() == 0:
-         self.trans2Box.Enable(false)
-      self.move2Sizer.Add(self.trans2Box, 0, wxALIGN_CENTRE | wxALL, 5)
+         self.trans2Box.Enable(False)
+      self.move2Sizer.Add(self.trans2Box, 0, ALIGN_CENTRE | ALL, 5)
       self.move2Sizer.Layout()
       self.sizer.Layout()
 
