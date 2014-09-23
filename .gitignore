@@ -1,0 +1,16 @@
+# Mac
+.DS_Store
+# Eclipse
+*.pydevproject
+.project
+.metadata
+.settings/
+# Python
+*.py[co]
+# Django
+*.sqlite
+# python ide
+*.komodoproject
+*.spyderproject
+# Project
+
